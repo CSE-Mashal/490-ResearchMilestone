@@ -16,6 +16,7 @@ export default function App() {
   const [sleep, setSleep] = useState('');
   const [soreness, setSoreness] = useState('');
   const [energy, setEnergy] = useState('');
+  const [result, setResult] = useState(null);
 
   function login() {
     if (!email || !password) {
@@ -80,12 +81,61 @@ export default function App() {
     suggestion = 'Focus on sleep, recovery, and rest before intense exercise.';
   }
 
-  Alert.alert(
-    `Recovery Score: ${score}/100`,
-    `${status}\n\n${suggestion}`
-  );
+  setResult({ score, status, suggestion });
+setScreen('result');
 }
   
+if (screen === 'result' && result) {
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.card}>
+        <Text style={styles.title}>Your Recovery Score</Text>
+
+        <Text
+          style={{
+            color: '#B3193A',
+            fontSize: 58,
+            fontWeight: 'bold',
+            marginTop: 20,
+            textAlign: 'center',
+          }}
+        >
+          {result.score}/100
+        </Text>
+
+        <Text
+          style={{
+            color: '#101827',
+            fontSize: 22,
+            fontWeight: 'bold',
+            marginTop: 10,
+            textAlign: 'center',
+          }}
+        >
+          {result.status}
+        </Text>
+
+        <Text style={styles.message}>{result.suggestion}</Text>
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => {
+            setSleep('');
+            setSoreness('');
+            setEnergy('');
+            setScreen('checkin');
+          }}
+        >
+          <Text style={styles.buttonText}>New Check-In</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => setScreen('home')}>
+          <Text style={styles.link}>Back to Home</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
+  );
+}
 
   if (screen === 'checkin') {
     return (
