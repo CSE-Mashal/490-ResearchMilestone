@@ -2,7 +2,6 @@ import { useState } from 'react';
 import {
   Alert,
   SafeAreaView,
-  StatusBar,
   StyleSheet,
   Text,
   TextInput,
@@ -11,35 +10,96 @@ import {
 } from 'react-native';
 
 export default function App() {
+  const [screen, setScreen] = useState('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [sleep, setSleep] = useState('');
+  const [soreness, setSoreness] = useState('');
+  const [energy, setEnergy] = useState('');
 
-  function handleLogin() {
-    if (email.trim() === '' || password.trim() === '') {
-      Alert.alert('Missing information', 'Please enter your email and password.');
+  function login() {
+    if (!email || !password) {
+      Alert.alert('Missing information', 'Enter an email and password.');
+      return;
+    }
+    setScreen('home');
+  }
+
+  function continueCheckIn() {
+    if (!sleep || !soreness || !energy) {
+      Alert.alert('Missing information', 'Complete all three check-in fields.');
       return;
     }
 
-    setIsLoggedIn(true);
+    Alert.alert('Check-In Saved', 'Your recovery score will be calculated next.');
   }
 
-  if (isLoggedIn) {
+  if (screen === 'checkin') {
     return (
       <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="light-content" />
+        <View style={styles.card}>
+          <Text style={styles.title}>Daily Check-In</Text>
+          <Text style={styles.subtitle}>Tell us how you feel today.</Text>
 
-        <View style={styles.welcomeCard}>
+          <Text style={styles.label}>Hours of sleep last night</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Example: 7.5"
+            value={sleep}
+            onChangeText={setSleep}
+            keyboardType="decimal-pad"
+          />
+
+          <Text style={styles.label}>Soreness level (1–10)</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="1 = low, 10 = very sore"
+            value={soreness}
+            onChangeText={setSoreness}
+            keyboardType="number-pad"
+          />
+
+          <Text style={styles.label}>Energy level (1–10)</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="1 = low, 10 = high"
+            value={energy}
+            onChangeText={setEnergy}
+            keyboardType="default"
+           returnKeyType="done"
+       onSubmitEditing={continueCheckIn}
+          />
+
+          <TouchableOpacity style={styles.button} onPress={continueCheckIn}>
+            <Text style={styles.buttonText}>Calculate Recovery Score</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => setScreen('home')}>
+            <Text style={styles.link}>Back to Home</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (screen === 'home') {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.card}>
           <Text style={styles.logo}>GR</Text>
           <Text style={styles.title}>GameReady</Text>
-          <Text style={styles.subtitle}>Welcome, athlete!</Text>
+          <Text style={styles.subtitle}>Recovery & Sleep</Text>
+          <Text style={styles.message}>Welcome! Your daily check-in is ready.</Text>
 
-          <Text style={styles.message}>
-            Your Recovery & Sleep check-in is ready.
-          </Text>
-
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => setScreen('checkin')}
+          >
             <Text style={styles.buttonText}>Start Check-In</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => setScreen('login')}>
+            <Text style={styles.link}>Log Out</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -48,42 +108,34 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" />
-
-      <View style={styles.loginCard}>
+      <View style={styles.card}>
         <Text style={styles.logo}>GR</Text>
         <Text style={styles.title}>GameReady</Text>
         <Text style={styles.subtitle}>Recovery & Sleep</Text>
 
         <Text style={styles.heading}>Welcome Back</Text>
-        <Text style={styles.description}>
-          Sign in to complete your daily recovery check-in.
-        </Text>
 
         <TextInput
           style={styles.input}
           placeholder="Email"
-          placeholderTextColor="#7A8290"
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"
-          keyboardType="email-address"
         />
 
         <TextInput
           style={styles.input}
           placeholder="Password"
-          placeholderTextColor="#7A8290"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
         />
 
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+        <TouchableOpacity style={styles.button} onPress={login}>
           <Text style={styles.buttonText}>Log In</Text>
         </TouchableOpacity>
 
-        <Text style={styles.note}>Demo app — enter any email and password.</Text>
+        <Text style={styles.note}>Demo: enter any email and password.</Text>
       </View>
     </SafeAreaView>
   );
@@ -92,18 +144,12 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#101827',
     justifyContent: 'center',
     padding: 24,
+    backgroundColor: '#101827',
   },
-  loginCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 28,
-  },
-  welcomeCard: {
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+  card: {
+    backgroundColor: 'white',
     borderRadius: 20,
     padding: 28,
   },
@@ -111,74 +157,74 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     backgroundColor: '#B3193A',
     borderRadius: 10,
-    color: '#FFFFFF',
+    color: 'white',
     fontSize: 20,
-    fontWeight: '800',
+    fontWeight: 'bold',
     marginBottom: 12,
     overflow: 'hidden',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    padding: 10,
   },
   title: {
     color: '#101827',
     fontSize: 30,
-    fontWeight: '800',
+    fontWeight: 'bold',
     textAlign: 'center',
   },
   subtitle: {
     color: '#B3193A',
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: 'bold',
+    marginBottom: 24,
     marginTop: 4,
     textAlign: 'center',
   },
   heading: {
     color: '#101827',
     fontSize: 24,
-    fontWeight: '700',
-    marginTop: 30,
+    fontWeight: 'bold',
+    marginBottom: 18,
   },
-  description: {
-    color: '#596273',
+  label: {
+    color: '#101827',
     fontSize: 15,
-    lineHeight: 22,
-    marginBottom: 22,
-    marginTop: 8,
+    fontWeight: 'bold',
+    marginBottom: 6,
   },
   input: {
     backgroundColor: '#F2F4F7',
-    borderColor: '#D7DCE3',
     borderRadius: 10,
-    borderWidth: 1,
-    color: '#101827',
     fontSize: 16,
-    marginBottom: 14,
+    marginBottom: 16,
     padding: 15,
   },
   button: {
     backgroundColor: '#B3193A',
     borderRadius: 10,
-    marginTop: 6,
+    marginTop: 8,
     padding: 16,
   },
   buttonText: {
-    color: '#FFFFFF',
+    color: 'white',
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: 'bold',
     textAlign: 'center',
   },
   note: {
-    color: '#7A8290',
-    fontSize: 12,
-    marginTop: 18,
+    color: '#6B7280',
+    marginTop: 16,
     textAlign: 'center',
   },
   message: {
-    color: '#596273',
+    color: '#4B5563',
     fontSize: 16,
-    lineHeight: 24,
     marginBottom: 20,
-    marginTop: 28,
+    textAlign: 'center',
+  },
+  link: {
+    color: '#B3193A',
+    fontSize: 15,
+    fontWeight: 'bold',
+    marginTop: 20,
     textAlign: 'center',
   },
 });
