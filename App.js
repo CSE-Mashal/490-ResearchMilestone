@@ -17,6 +17,7 @@ export default function App() {
   const [soreness, setSoreness] = useState('');
   const [energy, setEnergy] = useState('');
   const [result, setResult] = useState(null);
+  const [history, setHistory] = useState([]);
 
   function login() {
     if (!email || !password) {
@@ -81,7 +82,14 @@ export default function App() {
     suggestion = 'Focus on sleep, recovery, and rest before intense exercise.';
   }
 
-  setResult({ score, status, suggestion });
+  const newCheckIn = {
+  score,
+  status,
+  date: new Date().toLocaleDateString(),
+};
+
+setHistory((previousHistory) => [newCheckIn, ...previousHistory]);
+setResult({ score, status, suggestion });
 setScreen('result');
 }
   
@@ -193,6 +201,36 @@ if (screen === 'result' && result) {
           <Text style={styles.title}>GameReady</Text>
           <Text style={styles.subtitle}>Recovery & Sleep</Text>
           <Text style={styles.message}>Welcome! Your daily check-in is ready.</Text>
+          {history.length > 0 && (
+  <View
+    style={{
+      backgroundColor: '#F2F4F7',
+      borderRadius: 10,
+      marginBottom: 20,
+      padding: 14,
+    }}
+  >
+    <Text
+      style={{
+        color: '#101827',
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginBottom: 8,
+      }}
+    >
+      Recent Check-Ins
+    </Text>
+
+    {history.slice(0, 3).map((item, index) => (
+      <Text
+        key={`${item.date}-${index}`}
+        style={{ color: '#4B5563', marginBottom: 4 }}
+      >
+        {item.date}: {item.score}/100 — {item.status}
+      </Text>
+    ))}
+  </View>
+)}
 
           <TouchableOpacity
             style={styles.button}
