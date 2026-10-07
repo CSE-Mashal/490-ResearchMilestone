@@ -26,13 +26,66 @@ export default function App() {
   }
 
   function continueCheckIn() {
-    if (!sleep || !soreness || !energy) {
-      Alert.alert('Missing information', 'Complete all three check-in fields.');
-      return;
-    }
+    
+  const sleepHours = Number(sleep);
+  const sorenessLevel = Number(soreness);
+  const energyLevel = Number(energy);
 
-    Alert.alert('Check-In Saved', 'Your recovery score will be calculated next.');
+  if (!sleep || !soreness || !energy) {
+    Alert.alert('Missing information', 'Complete all three check-in fields.');
+    return;
   }
+
+  if (
+    Number.isNaN(sleepHours) ||
+    Number.isNaN(sorenessLevel) ||
+    Number.isNaN(energyLevel) ||
+    sleepHours < 0 ||
+    sleepHours > 24 ||
+    sorenessLevel < 1 ||
+    sorenessLevel > 10 ||
+    energyLevel < 1 ||
+    energyLevel > 10
+  ) {
+    Alert.alert(
+      'Check your entries',
+      'Enter sleep hours and a soreness and energy level from 1 to 10.'
+    );
+    return;
+  }
+
+  let score = 100;
+
+  if (sleepHours < 6) {
+    score -= 30;
+  } else if (sleepHours < 7) {
+    score -= 15;
+  }
+
+  score -= sorenessLevel * 3;
+  score -= (10 - energyLevel) * 2;
+  score = Math.max(0, Math.min(100, Math.round(score)));
+
+  let status = '';
+  let suggestion = '';
+
+  if (score >= 80) {
+    status = 'Ready to Train';
+    suggestion = 'Great recovery today. Follow your planned workout and stay hydrated.';
+  } else if (score >= 60) {
+    status = 'Take It Easy';
+    suggestion = 'Consider lighter training, mobility work, and extra hydration.';
+  } else {
+    status = 'Prioritize Rest';
+    suggestion = 'Focus on sleep, recovery, and rest before intense exercise.';
+  }
+
+  Alert.alert(
+    `Recovery Score: ${score}/100`,
+    `${status}\n\n${suggestion}`
+  );
+}
+  
 
   if (screen === 'checkin') {
     return (
